@@ -27,7 +27,7 @@
                   <center>
                   <h4 class="card-title">{{event.title|truncatechars:15}}</h4>
                   <p class="card-text">{{event.date}} {{event.time}}</p>
-                  <p class="card-text">{{event.seats}}</p>
+                  <p class="card-text">{{event.booked_seats}} / {{event.seats}}</p>
                   <p class="card-text"><small class="text-muted">{{event.date}} {{event.time}}</small></p>
                   <a href="{% url 'event-detail' event.id %}" class="btn btn-outline-primary mt-3">View Event</a>
                   </center>

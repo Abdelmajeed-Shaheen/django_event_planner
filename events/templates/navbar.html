@@ -18,7 +18,10 @@
           <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'dashboard' %}">{{ request.user }}</a>
+          <a class="nav-link" href="{% url 'profile-list' %}">{{ request.user }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
         </li>
         {% endif %}
       </ul>
