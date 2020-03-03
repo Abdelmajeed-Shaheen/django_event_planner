@@ -1,3 +1,4 @@
+{% load permission_tags %}
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom ">
   <div class="container">
     <a class="navbar-brand" href="{% url 'home' %}">Django Event Planner</a>
@@ -20,9 +21,16 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'profile-list' %}">{{ request.user }}</a>
         </li>
+
+        {%if request.user|can:'is_organizer' %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
         </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'organizer-list' %}">Organizers</a>
+        </li>
+        {% endif %}
         {% endif %}
       </ul>
     </div>

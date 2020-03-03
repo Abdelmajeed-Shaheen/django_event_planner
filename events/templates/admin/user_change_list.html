@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+{% block object-tools %}
+        <form class="form" action="">
+        <div class="form-group">
+        <input type="number" name='tic' class="form-control" placeholder="User ID"  required/>
+        </div>
+        <input class="btn btn-outline-primary my-2 my-sm-0 mt-2" type="submit" >Make Organizer</input>
+        </form>
+  {{block.super}}
+{% endblock object-tools %}

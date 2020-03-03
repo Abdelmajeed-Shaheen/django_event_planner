@@ -7,7 +7,19 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
 from .forms import UserSignup, UserLogin, EventUpdate
-from .models import Event, Ticket
+from .models import Event, Ticket, Follow
+from django.contrib.auth.models import User
+from rolepermissions.roles import assign_role
+from rolepermissions.checkers import has_permission
+
+def asgin_organizer(request,user_id):
+	if request.user.is_superuser:
+		user = User.objects.get(id=user_id)
+		assign_role(user, 'organizer')
+		messages.success(request, "Role Granted")
+		return redirect('home')
+	messages.warning(request, "Ask It From The Admin")
+	return redirect('login')
 
 def home(request):
 	return render(request, 'home.html')
@@ -26,6 +38,18 @@ def profile_list(request):
 		"events":list_events
 	}
 	return render(request, 'profile.html',context)
+
+def profile_update(request):
+	if request.user.is_anonymous:
+		return redirect('login')
+	user = User.objects.get(id = request.user.id)
+	user.first_name = request.GET.get('first_name')
+	user.last_name = request.GET.get('last_name')
+	user.email = request.GET.get('email')
+	user.save()
+	messages.success(request, f"You have successfully Updated you Profile {request.user.username}")
+	return redirect('profile-list')
+
 
 def event_list(request):
 	if request.user.is_anonymous:
@@ -46,9 +70,8 @@ def event_list(request):
 	}
 	return render(request, 'event_list.html',context)
 
-
 def dashboard(request):
-	if request.user.is_authenticated:
+	if request.user.is_authenticated and has_permission(request.user, 'is_organizer'):
 		# events = Event.objects.filter(organizer=request.user)
 		events = request.user.events.all()
 		query = request.GET.get('q')
@@ -102,6 +125,7 @@ def event_update(request, event_id):
 			form = EventUpdate(request.POST, request.FILES, instance = event_obj)
 			if form.is_valid():
 				form.save()
+				messages.success(request, f"You have successfully Updated your event {request.user.username}")
 				return redirect('event-detail', event_id)
 		context = {
 		"event": event_obj,
@@ -111,7 +135,7 @@ def event_update(request, event_id):
 	return redirect('login')
 
 def event_create(request):
-	if request.user.is_anonymous:
+	if request.user.is_anonymous or not has_permission(request.user, 'is_organizer'):
 		return redirect('login')
 	form = EventUpdate()
 	if request.method=="POST":
@@ -120,6 +144,7 @@ def event_create(request):
 			event=form.save(commit=False)
 			event.organizer = request.user
 			event.save()
+			messages.success(request, f"You have successfully Created your event {request.user.username}")
 			return redirect('dashboard')
 	context = {
 	'form': form,
@@ -133,6 +158,56 @@ def event_delete(request , event_id):
 		return redirect('dashboard')
 	return redirect('login')
 
+def organizer_list(request):
+	if request.user.is_anonymous:
+		return redirect('login')
+	users = User.objects.all()
+	user_list = []
+	for user in users:
+		if has_permission(user, 'is_organizer'):
+			user_list.append(user)
+	context={
+		'users':user_list,
+	}
+	return render(request,'organizer_list.html',context)
+
+def organizer_event_list(request , organizer_id):
+	if request.user.is_anonymous:
+		return redirect('login')
+	organizer = User.objects.get(id=organizer_id)
+	following = False
+	if Follow.objects.filter(user = request.user,organizer = organizer).count() > 0:
+		following = True
+	events = Event.objects.filter(organizer = organizer)
+	context = {
+		"events":events,
+		"organizer":organizer,
+		"following":following,
+	}
+	return render(request, 'organizer_events.html',context)
+
+def follow_organizer(request,organizer_id):
+	if request.user.is_anonymous:
+		return redirect('login')
+	organizer = User.objects.get(id=organizer_id)
+	if Follow.objects.filter(user = request.user,organizer = organizer).count() > 0:
+		messages.warning(request, f"You already Followed {organizer.username}")
+		return redirect('organizer-events',organizer_id)
+	Follow.objects.create(user=request.user, organizer=organizer)
+	messages.success(request, f"You are Following {organizer.username} NOW")
+	return redirect('organizer-events',organizer_id)
+
+def unfollow_organizer(request,organizer_id):
+	if request.user.is_anonymous:
+		return redirect('login')
+	organizer = User.objects.get(id=organizer_id)
+	if Follow.objects.filter(user = request.user,organizer = organizer).count() == 0:
+		messages.warning(request, f"You have to Follow {organizer.username} in order to unfollow")
+		return redirect('organizer-events',organizer_id)
+	follow_obj = Follow.objects.get(user=request.user,organizer=organizer)
+	follow_obj.delete()
+	messages.success(request, f"You Un-Followed {organizer.username}")
+	return redirect('organizer-events',organizer_id)
 
 # User CRUD functions
 class Signup(View):
@@ -174,7 +249,7 @@ class Login(View):
 			if auth_user is not None:
 				login(request, auth_user)
 				messages.success(request, "Welcome Back!")
-				return redirect('dashboard')
+				return redirect('home')
 			messages.warning(request, "Wrong email/password combination. Please try again.")
 			return redirect("login")
 		messages.warning(request, form.errors)

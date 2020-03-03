@@ -1,35 +1,108 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-  <div class="row">
-  <div class="col-md-3 mt-2">
-  </div>
-  <div class="col-md-3 mt-2">
-  </div>
-  <div class="col-md-6 mt-2">
-  </div>
-  </div>
-  <div class="row mt-2 mb-2">
-      {% for event in events %}
-      <div class="col-md-4 mt-2">
-              <div class="card h-100">
-                {% if event.logo %}
-                <img class="card-img-top img-fluid" src="{{event.logo.url}}" alt="Card image cap" style="width: 100%;height: 15vw;object-fit: scale-down;">
-                {% else %}
-                <img class="card-img-top img-fluid" src="/static/img/01.jpg" alt="Card image cap" style="width: 100%;height: 15vw;object-fit: scale-down;">
-                {% endif %}
-                <div class="card-body">
-                  <center>
-                  <h4 class="card-title">{{event.title|truncatechars:15}}</h4>
-                  <p class="card-text">{{event.date}} {{event.time}}</p>
-                  <p class="card-text"><small class="text-muted">{{event.date}} {{event.time}}</small></p>
-                  <a href="{% url 'event-detail' event.id %}" class="btn btn-outline-primary mt-3">View Event</a>
-                  </center>
-                </div>
-              </div>
-        </div>
-      {% endfor %}
+<!-- Nav tabs -->
+<div class="container mt-2">
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#events">Previous Events</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#menu1">Profile</a>
+  </li>
 
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane container active" id="events">
+    <div class="row">
+
+
+    {% for event in events %}
+    <div class="col-md-4 mt-2">
+            <div class="card h-100">
+              {% if event.logo %}
+              <img class="card-img-top img-fluid" src="{{event.logo.url}}" alt="Card image cap" style="width: 100%;height: 15vw;object-fit: scale-down;">
+              {% else %}
+              <img class="card-img-top img-fluid" src="/static/img/01.jpg" alt="Card image cap" style="width: 100%;height: 15vw;object-fit: scale-down;">
+              {% endif %}
+              <div class="card-body">
+                <center>
+                <h4 class="card-title">{{event.title|truncatechars:15}}</h4>
+                <p class="card-text">{{event.date}} {{event.time}}</p>
+                <p class="card-text"><small class="text-muted">{{event.date}} {{event.time}}</small></p>
+                <a href="{% url 'event-detail' event.id %}" class="btn btn-outline-primary mt-3">View Event</a>
+                </center>
+              </div>
+            </div>
+      </div>
+    {% endfor %}
+  </div>
+  </div>
+  <div class="tab-pane container fade" id="menu1">
+    <div class="row mt-2">
+      <div class="col-md-3">
+
+      </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-lg-8 col-md-6">
+                            <h3 class="mb-0 text-truncated"><small>Username</small> {{request.user.username}}</h3>
+                            <p class="lead">Name: {{request.user.first_name}} {{request.user.last_name}}</p>
+                            <p class="lead">Email: {{request.user.email}}</p>
+
+                        </div>
+                        <div class="col-12 col-lg-4 col-md-6 text-center">
+                            <img src="https://robohash.org/68.186.255.198.png" alt="" class="mx-auto rounded-circle img-fluid">
+                        </div>
+                        <div class="col-12 col-lg-4 mt-2">
+                            <a href="" class="btn btn-outline-primary mt-3" data-toggle="modal" data-target="#BookMoadl">Update</a>
+                        </div>
+                        <!--/col-->
+                    </div>
+                    <!--/row-->
+                </div>
+                <!--/card-block-->
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- > update modal </-->
+<div class="modal fade" id="BookMoadl" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered" role="document">
+ <div class="modal-content">
+   <div class="modal-header">
+     <h5 class="modal-title" id="exampleModalCenterTitle">Book your Tickets</h5>
+     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+       <span aria-hidden="true">&times;</span>
+     </button>
+   </div>
+   <div class="modal-body">
+     <form action="{% url 'profile-update' %}">
+       {% csrf_token %}
+     <div class="form-group">
+     <label >First Name</label>
+     <input type="text" class="form-control"  name="first_name" value="{{request.user.first_name}}" required/>
+     </div>
+     <div class="form-group">
+     <label >Last Name</label>
+     <input type="text" class="form-control"  name="last_name" value="{{request.user.last_name}}" required/>
+     </div>
+     <div class="form-group">
+     <label >Email Address</label>
+     <input type="email" class="form-control" name="email" value="{{request.user.email}}" required/>
+     </div>
+     <input class="btn btn-outline-primary my-2 my-sm-0 mt-2" type="submit" value="Update">
+     <a  class="btn btn-outline-secondary my-2 my-sm-0 mt-2" data-dismiss="modal">Cancel</a>
+     </form>
+   </div>
+
+ </div>
 </div>
 </div>
 {% endblock %}

@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+from django.db.models.signals import pre_save ,post_save
+from django.dispatch import receiver
 
 
 class Event(models.Model):
@@ -22,7 +25,26 @@ class Event(models.Model):
     def is_full(self):
         return self.booked_seats == self.seats
 
+@receiver(post_save, sender=Event)
+def sendemail_ticket_create(instance, *args, **kwargs):
+    followers = Follow.objects.filter(organizer=instance.organizer)
+    count = 0
+    for follower in followers:
+        count += 1
+    email = EmailMessage(f"{instance.organizer.username} created an event", f"this email will be sent to {count} users", to=['shaheen.abdelmajeed@outlook.com'])
+    email.send()
+
+
 class Ticket(models.Model):
     event = models.ForeignKey(Event, on_delete = models.CASCADE, related_name='tickets') #which event?
     booker = models.ForeignKey(User, on_delete = models.CASCADE, related_name='tickets') #who is booking?
     number_of_tickets = models.PositiveIntegerField() #how many Tickets for this event?
+
+@receiver(pre_save, sender=Ticket)
+def sendemail(instance, *args, **kwargs):
+    email = EmailMessage('You booked Tickets', f"{instance.booker.username} booked {instance.number_of_tickets} seats for the event ({instance.event.title})", to=['shaheen.abdelmajeed@outlook.com'])
+    email.send()
+
+class Follow(models.Model):
+    user = models.ForeignKey(User, on_delete = models.CASCADE,related_name='followers')
+    organizer = models.ForeignKey(User, on_delete = models.CASCADE)

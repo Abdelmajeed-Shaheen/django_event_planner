@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'eventdjango@gmail.com'
+EMAIL_HOST_PASSWORD = 'nbvi vdts nsug knxr'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Application definition
 
@@ -43,9 +48,10 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'rest_framework',
+    'rolepermissions',
 ]
-
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+ROLEPERMISSIONS_MODULE = 'event_planner.roles'
 
 REST_FRAMEWORK = {
 
@@ -53,7 +59,7 @@ REST_FRAMEWORK = {
 
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
-    
+
 }
 
 MIDDLEWARE = [
