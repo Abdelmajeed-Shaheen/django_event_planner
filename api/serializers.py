@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from events.models import Event, Ticket
+from events.models import Event, Ticket, Follow
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -46,3 +46,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         new_user.set_password(validated_data.get("password"))
         new_user.save()
         return validated_data
+
+class ListofOrganizers(serializers.ModelSerializer):
+    organizer=UserSerializer()
+    class Meta:
+        model = Follow
+        fields = ['organizer']

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import status
-from events.models import Event, Ticket
+from events.models import Event, Ticket, Follow
 from .serializers import (
 EventsSerializer,
 CreateEventsSerializer,
@@ -11,6 +11,7 @@ RegisterSerializer,
 BookerSerializer,
 BookedEventsSerializer,
 CreateBookingSerializer,
+ListofOrganizers,
 )
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOrganizer
@@ -84,3 +85,11 @@ class BookingView(APIView):
 			event.save()
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+class ListofOrganizersView(APIView):
+	def get(self, request):
+		self.permission_classes = [IsAuthenticated]
+		self.check_permissions(request)
+		follow_list = Follow.objects.filter(user=request.user)
+		serializer=ListofOrganizers(follow_list,many=True)
+		return Response(serializer.data)

@@ -27,12 +27,15 @@ class Event(models.Model):
 
 @receiver(post_save, sender=Event)
 def sendemail_ticket_create(instance, *args, **kwargs):
-    followers = Follow.objects.filter(organizer=instance.organizer)
-    count = 0
-    for follower in followers:
-        count += 1
-    email = EmailMessage(f"{instance.organizer.username} created an event", f"this email will be sent to {count} users", to=['shaheen.abdelmajeed@outlook.com'])
-    email.send()
+    if instance:
+        followers = Follow.objects.filter(organizer=instance.organizer)
+        count = 0
+        for follower in followers:
+            count += 1
+        email = EmailMessage(f"{instance.organizer.username} created an event", f"this email will be sent to {count} users", to=['shaheen.abdelmajeed@outlook.com'])
+        email.send()
+    else:
+        pass
 
 
 class Ticket(models.Model):
