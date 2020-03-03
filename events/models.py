@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.db.models.signals import pre_save ,post_save
 from django.dispatch import receiver
+from datetime import datetime
 
 
 class Event(models.Model):
@@ -42,6 +43,15 @@ class Ticket(models.Model):
     event = models.ForeignKey(Event, on_delete = models.CASCADE, related_name='tickets') #which event?
     booker = models.ForeignKey(User, on_delete = models.CASCADE, related_name='tickets') #who is booking?
     number_of_tickets = models.PositiveIntegerField() #how many Tickets for this event?
+
+    def can_cancel(self):
+        event_datetime = datetime.combine(self.event.date, self.event.time)
+        diff = event_datetime - datetime.today()
+        days, seconds = diff.days, diff.seconds
+        hours = days * 24 + seconds // 3600
+        if hours >= 3:
+            return True
+        return False
 
 @receiver(pre_save, sender=Ticket)
 def sendemail(instance, *args, **kwargs):

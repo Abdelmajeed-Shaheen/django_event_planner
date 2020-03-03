@@ -17,6 +17,7 @@ urlpatterns = [
     path('event/<int:event_id>/update', event_update, name='event-update'),
 	path('event/<int:event_id>/delete', event_delete, name='event-delete'),
 	path('event/<int:event_id>/book', booking_tickets, name='event-book'),
+	path('book/<int:book_id>/cancel', book_cancel, name='book-cancel'),
 	path('event/create', event_create, name='event-create'),
     path('dashboard/', dashboard, name='dashboard'),
     path('user/<int:user_id>', asgin_organizer, name='asgin'),

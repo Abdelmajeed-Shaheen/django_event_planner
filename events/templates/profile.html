@@ -9,6 +9,9 @@
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#menu1">Profile</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#menu2">Bokkings</a>
+  </li>
 
 </ul>
 
@@ -68,6 +71,34 @@
             </div>
         </div>
     </div>
+  </div>
+  <div class="tab-pane container fade" id="menu2">
+    <div class="row">
+
+
+    {% for book in bookings %}
+    <div class="col-md-4 mt-2">
+            <div class="card h-100">
+              {% if book.event.logo %}
+              <img class="card-img-top img-fluid" src="{{book.event.logo.url}}" alt="Card image cap" style="width: 100%;height: 15vw;object-fit: scale-down;">
+              {% else %}
+              <img class="card-img-top img-fluid" src="/static/img/01.jpg" alt="Card image cap" style="width: 100%;height: 15vw;object-fit: scale-down;">
+              {% endif %}
+              <div class="card-body">
+                <center>
+                <h4 class="card-title">{{book.event.title|truncatechars:15}}</h4>
+                <p class="card-text">{{book.number_of_tickets}}</p>
+                {% if book.can_cancel %}
+                <a href="{% url 'book-cancel' book.id %}" class="btn btn-outline-danger mt-3">Delete</a>
+                {% else %}
+                <span class="alert alert-danger mt-5">Event Cant Be Deleted</span>
+                {% endif %}
+                </center>
+              </div>
+            </div>
+      </div>
+    {% endfor %}
+  </div>
   </div>
 </div>
 </div>

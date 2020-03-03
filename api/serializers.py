@@ -52,3 +52,9 @@ class ListofOrganizers(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ['organizer']
+
+
+class FollowOrganizerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields=['organizer']

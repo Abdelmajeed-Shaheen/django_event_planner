@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.forms.widgets import HiddenInput
@@ -28,6 +29,7 @@ def profile_list(request):
 	if request.user.is_anonymous:
 		return redirect('login')
 	booked_events = Ticket.objects.filter(event__date__lt=datetime.today(),booker=request.user)
+	bookings = Ticket.objects.filter(booker=request.user)
 	list_events = []
 	for event in booked_events:
 		if event in list_events:
@@ -35,7 +37,8 @@ def profile_list(request):
 		else:
 			list_events.append(Event.objects.get(id=event.event.id))
 	context = {
-		"events":list_events
+		"events":list_events,
+		"bookings":bookings,
 	}
 	return render(request, 'profile.html',context)
 
@@ -208,6 +211,18 @@ def unfollow_organizer(request,organizer_id):
 	follow_obj.delete()
 	messages.success(request, f"You Un-Followed {organizer.username}")
 	return redirect('organizer-events',organizer_id)
+
+def book_cancel(request,book_id):
+	book_obj = Ticket.objects.get(id=book_id)
+	if request.user.is_anonymous or request.user != book_obj.booker:
+		return redirect('login')
+	if book_obj.can_cancel():
+		book_obj.delete()
+		messages.success(request, f"you have canceled your booking")
+		return redirect('profile-list')
+	messages.warning(request, f"you can't cancele your booking at this time")
+	return redirect('profile-list')
+
 
 # User CRUD functions
 class Signup(View):
