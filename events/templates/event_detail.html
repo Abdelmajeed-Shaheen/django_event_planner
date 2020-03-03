@@ -34,8 +34,10 @@
 
           {% elif event.seats == event.booked_seats %}
           <span class="alert alert-danger mt-2">Tickets Sold Out</span>
-          {% else %}
+          {% elif event.can_book %}
           <a href="" class="btn btn-outline-primary mt-3" data-toggle="modal" data-target="#BookMoadl">Book</a>
+          {% else %}
+          <span class="alert alert-danger mt-2">Event has passed</span>
           {% endif %}
           </center>
         </div>

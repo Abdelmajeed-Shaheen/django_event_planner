@@ -26,6 +26,15 @@ class Event(models.Model):
     def is_full(self):
         return self.booked_seats == self.seats
 
+    def can_book(self):
+        event_datetime = datetime.combine(self.date, self.time)
+        diff = event_datetime - datetime.today()
+        days, seconds = diff.days, diff.seconds
+        hours = days * 24 + seconds // 3600
+        if hours >= 3:
+            return True
+        return False
+
 @receiver(post_save, sender=Event)
 def sendemail_ticket_create(instance, *args, **kwargs):
     if instance:
