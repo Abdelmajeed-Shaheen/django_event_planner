@@ -217,6 +217,9 @@ def book_cancel(request,book_id):
 	if request.user.is_anonymous or request.user != book_obj.booker:
 		return redirect('login')
 	if book_obj.can_cancel():
+		event_obj = Event.objects.get(id=book_obj.event.id)
+		event_obj.booked_seats -= book_obj.number_of_tickets
+		event_obj.save()
 		book_obj.delete()
 		messages.success(request, f"you have canceled your booking")
 		return redirect('profile-list')
