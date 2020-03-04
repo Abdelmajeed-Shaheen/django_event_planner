@@ -45,23 +45,22 @@
   </div>
 {% if request.user == event.organizer %}
   <div class="col-md-3 mt-3">
-      <div class="table-wrapper">
+      <div style="overflow-y: scroll; height:100%;" class="bg-dark">
 
-      <table class="table table-striped table-dark table-responsive">
+      <table class="table table-striped table-dark text-center">
         <thead>
           <tr>
-            <th class="col-xs-3">User Name</th>
-            <th class="col-xs-3"># Tickets</th>
-            <th>   </th>
+            <th >User Name</th>
+            <th ># Tickets</th>
           </tr>
         </thead>
         <tbody>
           {% for booker in bookers %}
           <tr>
-            <td class="col-xs-3">{{booker.booker.username}}</td>
-            <td class="col-xs-3">{{booker.number_of_tickets}}</td>
-            <td>    </td>
+            <td >{{booker.booker.username}}</td>
+            <td >{{booker.number_of_tickets}}</td>
           </tr>
+
           {% endfor %}
         </tbody>
       </table>
